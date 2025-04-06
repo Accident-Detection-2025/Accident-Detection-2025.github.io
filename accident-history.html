@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accident History</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .log-table {
+            margin: auto;
+            width: 90%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .log-table th, .log-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .log-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📋 Accident History Log</h1>
+    <table class="log-table" id="historyTable">
+        <thead>
+            <tr>
+                <th>SL. NO.</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Google Maps</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmsxYRY5bt4uMkn5iOQDsj_cDmwdUh6YA",
+            authDomain: "accident-detection-dashboard.firebaseapp.com",
+            databaseURL: "https://accident-detection-dashboard-default-rtdb.firebaseio.com",
+            projectId: "accident-detection-dashboard",
+            storageBucket: "accident-detection-dashboard.firebasestorage.app",
+            messagingSenderId: "844653450909",
+            appId: "1:844653450909:web:637de3780920a4fe526674",
+            measurementId: "G-K7QRS838N5",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const tableBody = do2cument.querySelector("#historyTable tbody");
+
+        database.ref("/accidentLog").once("value", snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                let index = 1;
+                Object.values(data).reverse().forEach(entry => {
+                    const dateObj = new Date(entry.time);
+                    const date = dateObj.toLocaleDateString();
+                    const time = dateObj.toLocaleTimeString();
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${index++}</td>
+                        <td>${date}</td>
+                        <td>${time}</td>
+                        <td>${parseFloat(entry.latitude).toFixed(6)}</td>
+                        <td>${parseFloat(entry.longitude).toFixed(6)}</td>
+                        <td><a href="https://www.google.com/maps?q=${entry.latitude},${entry.longitude}" target="_blank">📍 View Map</a></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="5">No accident logs available.</td>`;
+                tableBody.appendChild(row);
+            }
+        });
+    </script>
+
+</body>
+</html>
