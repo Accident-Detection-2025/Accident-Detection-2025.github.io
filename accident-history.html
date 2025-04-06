@@ -67,7 +67,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        const tableBody = do2cument.querySelector("#historyTable tbody");
+        const tableBody = document.querySelector("#historyTable tbody");
 
         database.ref("/accidentLog").once("value", snapshot => {
             const data = snapshot.val();
